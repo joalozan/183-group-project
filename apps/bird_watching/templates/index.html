@@ -86,6 +86,7 @@
         <div class="button-group">
             <button @click="navigateToChecklist"><i class="fa-solid fa-list"></i> Submit Checklist</button>
             <button @click="navigateToStats"><i class="fa-solid fa-chart-bar"></i> My Birding</button>
+            <button @click="showStatisticsOnRegion"><i class="fa-solid fa-chart-area"></i> Statistics on Region</button>
         </div>
     </div>
 </div>
@@ -93,11 +94,16 @@
 [[block page_scripts]]
 <script>
     let my_callback_url = "[[=XML(my_callback_url)]]";
+    let species_url = "[[=XML(species_url)]]";
+    let sightings_url = "[[=XML(sightings_url)]]";
 </script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <script src="js/index.js"></script>
 [[end]]
