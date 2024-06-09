@@ -8,28 +8,85 @@
     height: 500px;
     width: 100%;
 }
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+.button-group {
+    margin-top: 20px;
+}
+.button-group button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+.button-group button:hover {
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+}
+.title {
+    color: #2c3e50;
+    font-family: 'Arial', sans-serif;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+.select-species {
+    margin-bottom: 20px;
+}
+.select-species label {
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+.select-species select {
+    padding: 10px;
+    font-size: 1em;
+}
+.content {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #333;
+}
 </style>
 
 <div class="section" id="app" v-cloak>
-    <h1 class="title"><i class="fa-solid fa-cube"></i> Bird Watching App</h1>
-    <p>Content: my_value: {{ my_value }} </p>
-    
-    <!-- Species Selection Box -->
-    <div>
-        <label for="species-select">Select Species:</label>
-        <select id="species-select" v-model="selectedSpecies" @change="updateMap">
-            <option value="all">All Species</option>
-            <option v-for="species in speciesList" :value="species">{{ species }}</option>
-        </select>
-    </div>
+    <div class="container">
+        <h1 class="title"><i class="fa-solid fa-dove"></i> Bird Watching App</h1>
+        
+        <div class="content">
+            <p>Content: my_value: {{ my_value }} </p>
+        </div>
 
-    <!-- Map Container -->
-    <div id="map"></div>
+        <!-- Species Selection Box -->
+        <div class="select-species">
+            <label for="species-select">Select Species:</label>
+            <select id="species-select" v-model="selectedSpecies" @change="updateMap">
+                <option value="all">All Species</option>
+                <option v-for="species in speciesList" :value="species">{{ species }}</option>
+            </select>
+        </div>
 
-    <!-- Links to other pages -->
-    <div>
-        <button @click="navigateToChecklist">Submit Checklist</button>
-        <button @click="navigateToStats">My Birding</button>
+        <!-- Map Container -->
+        <div id="map"></div>
+
+        <!-- Links to other pages -->
+        <div class="button-group">
+            <button @click="navigateToChecklist"><i class="fa-solid fa-list"></i> Submit Checklist</button>
+            <button @click="navigateToStats"><i class="fa-solid fa-chart-bar"></i> My Birding</button>
+        </div>
     </div>
 </div>
 
@@ -40,6 +97,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <script src="js/index.js"></script>
 [[end]]
