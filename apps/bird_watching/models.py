@@ -45,35 +45,35 @@ if db(db.species).isempty():
             db.species.insert(name=row[0])
 
 
-#db.define_table(
-#    'checklists',
-#    Field('event', 'string'),
-#    Field('latitude', 'string'),
-#    Field('longitude', 'string'),
-#    Field('observ_date', 'string'),
-#    Field('observ_time', 'string'),
-#    Field('observer_id', 'string', default=get_user_email),
-#    Field('duration', 'string')
-#)
+db.define_table(
+    'checklists',
+    Field('event', 'string'),
+    Field('latitude', 'string'),
+    Field('longitude', 'string'),
+    Field('observation_date', 'date'),
+    Field('observ_time', 'string'),
+    Field('observer_id', 'string', default=get_user_email),
+    Field('duration', 'string')
+)
 
 
-#if db(db.checklists).isempty():
-#    with open('checklists.csv', 'r', encoding='utf-8') as f:
-#        reader = csv.reader(f)
-#        next(reader)  # Skip the header
-#        for row in reader:
-#            valid_date = row[3] if is_valid_date(row[3]) else None  # Use None for invalid dates
-#            db.checklists.insert(
-#                event=row[0],
-#                latitude=row[1],
-#                longitude=row[2],
-#                observ_date=valid_date,  # Use the validated or None date
-#                observ_time=row[4],
-#                observer_id=row[5],
-#                duration=row[6]
-#            )
-#            if valid_date is None:
-#                print(f"Invalid date skipped and left empty: {row[3]}")
+if db(db.checklists).isempty():
+    with open('checklists.csv', 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header
+        for row in reader:
+            valid_date = row[3] if is_valid_date(row[3]) else None  # Use None for invalid dates
+            db.checklists.insert(
+                event=row[0],
+                latitude=row[1],
+                longitude=row[2],
+                observation_date=valid_date,  # Use the validated or None date
+                observ_time=row[4],
+                observer_id=row[5],
+                duration=row[6]
+            )
+            if valid_date is None:
+                print(f"Invalid date skipped and left empty: {row[3]}")
 
 
 
