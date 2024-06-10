@@ -62,10 +62,10 @@ new Vue({
                 });
         },
         navigateToChecklist() {
-            window.location.href = '/checklist';
+            window.location.href = '/bird_watching/checklist';
         },
         navigateToStats() {
-            window.location.href = '/stats';
+            window.location.href = '/bird_watching/user_stats';
         },
         showStatisticsOnRegion() {
             // Handle statistics on region logic here
