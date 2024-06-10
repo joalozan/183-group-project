@@ -73,11 +73,14 @@
         <!-- Species Selection Box -->
         <div class="select-species">
             <label for="species-select">Select Species:</label>
-            <select id="species-select" v-model="selectedSpecies" @change="updateMap">
-                <option value="all">All Species</option>
+            <select id="species-select" v-model="selectedSpecies">
+                <option value="">Select a Species</option>
                 <option v-for="species in speciesList" :value="species">{{ species }}</option>
             </select>
         </div>
+        
+        <!-- Manual Refresh Button -->
+        <button @click="updateMap">Refresh Map</button>
 
         <!-- Map Container -->
         <div id="map"></div>
