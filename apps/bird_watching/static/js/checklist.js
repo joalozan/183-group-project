@@ -52,6 +52,8 @@ app.data = {
                 observ_time: this.initialTimestamp.toISOString(),
                 duration: timeDiff,
                 species_and_count: this.selectedSpecies,
+                latitude: this.lat,
+                longitude: this.lng
                 //need also longitude and latitude
             })
             .then(response => {
@@ -88,6 +90,11 @@ app.data = {
         this.initialTimestamp = new Date();
         // Call saveTimestamp here if you want to save it as soon as the app is loaded
         this.saveTimestamp(this.initialTimestamp.toISOString());
+        const urlParams = new URLSearchParams(window.location.search);
+        this.lat = urlParams.get('lat');
+        this.lng = urlParams.get('lng');
+        // Use lat, lng as needed in your app
+        console.log(`Latitude: ${this.lat}, Longitude: ${this.lng}`);
     }
 };
 
