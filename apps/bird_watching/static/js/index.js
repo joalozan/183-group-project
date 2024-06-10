@@ -6,7 +6,8 @@ new Vue({
         speciesList: [],
         map: null,
         heatmapLayer: null,
-        drawnItems: new L.FeatureGroup()
+        drawnItems: new L.FeatureGroup(),
+        circleMarkerLayer: null  // To store the reference to the circleMarker layer
     },
     mounted() {
         this.fetchSpecies();
@@ -46,6 +47,7 @@ new Vue({
                         polygon: false,
                         polyline: false,
                         circle: false,
+                        circlemarker: true, // Enable the circleMarker tool
                         marker: false,
                         rectangle: true
                     }
@@ -55,6 +57,13 @@ new Vue({
                 // Event handler for drawing rectangles
                 this.map.on(L.Draw.Event.CREATED, (event) => {
                     var layer = event.layer;
+                    if (layer instanceof L.CircleMarker) {
+                        // Remove previous circleMarker if it exists
+                        if (this.circleMarkerLayer) {
+                            this.drawnItems.removeLayer(this.circleMarkerLayer);
+                        }
+                        this.circleMarkerLayer = layer;
+                    }
                     this.drawnItems.addLayer(layer);
                 });
             };
@@ -87,7 +96,13 @@ new Vue({
                 });
         },
         navigateToChecklist() {
-            window.location.href = '/bird_watching/checklist';
+            if (this.circleMarkerLayer) {
+                const center = this.circleMarkerLayer.getLatLng();
+                // Redirect to checklist page with circle center as parameters
+                window.location.href = `/bird_watching/checklist?lat=${center.lat}&lng=${center.lng}`;
+            } else {
+                alert("Please draw a circle marker to select a region.");
+            }
         },
         navigateToStats() {
             window.location.href = '/bird_watching/user_stats';
