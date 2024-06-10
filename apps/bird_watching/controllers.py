@@ -47,8 +47,8 @@ def manage_checklists():
 @action('get_checklists', method=['GET'])
 @action.uses(db, auth.user)
 def get_checklists():
-    user_email = auth.current_user.get('email') #uncomment this and comment line below and it will be the users checklists
-    #user_email = 'obs1644106'
+    #user_email = auth.current_user.get('email') #uncomment this and comment line below and it will be the users checklists
+    user_email = 'obs1644106'
     checklists = db(db.checklists.observer_id == user_email).select().as_list()
 
     for checklist in checklists:
