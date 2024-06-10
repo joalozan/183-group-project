@@ -263,6 +263,11 @@ def user_stats(path=None):
 @action.uses('event.html', db, session, auth)
 def event(path=None):
     date = db.checklists(db.checklists.event == path).observation_date
+    latitude = db.checklists(db.checklists.event == path).latitude
+    longitude = db.checklists(db.checklists.event == path).longitude
+    print(date, latitude, longitude)
     return dict(
         date = date,
+        latitude = latitude,
+        longitude = longitude,
     )

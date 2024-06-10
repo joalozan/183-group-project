@@ -1,5 +1,46 @@
 [[extend 'layout.html']]
 
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #map {
+        height: 500px;
+        width: 100%;
+    }
+    .title {
+        color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+    h1 {
+        color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        font-size: 200.5px;
+        margin-bottom: 20px;
+    
+    }
+</style>
+
 <div class="section" >
-    [[=XML(date)]] 
+    <h1>[[=XML(date)]]</h1>
+    <div id="map"></div>
+    <a href="/bird_watching/user_stats">
+        <button>Go Back</button>
+    </a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<script>
+    let longitude = "[[=XML(longitude)]]";
+    let latitude = "[[=XML(latitude)]]";
+</script>
+<script src="js/event.js"></script>
+
