@@ -2,6 +2,8 @@
 This file defines the database models
 """
 
+import random
+import string
 import csv
 import datetime
 from .common import db, Field, auth
