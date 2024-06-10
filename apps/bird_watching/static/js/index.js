@@ -42,7 +42,7 @@ new Vue({
                     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }).addTo(this.map);
 
-                this.heatmapLayer = L.heatLayer([], { radius: 35, blur: 15, maxZoom: 17, opacity: 0.8 }).addTo(this.map);
+                this.updateMap();
 
                 // Initialize the draw control and pass it the FeatureGroup of editable layers
                 this.map.addLayer(this.drawnItems);
@@ -89,41 +89,38 @@ new Vue({
                 initializeMap(defaultLat, defaultLng);
             }
         },
+
         updateMap() {
             console.log('Updating map for species:', this.selectedSpecies);
-            const species = this.selectedSpecies;
-            if (!species) {
-                console.log('No species selected');
-                if (this.heatmapLayer) {
-                    this.map.removeLayer(this.heatmapLayer);
-                    this.heatmapLayer = L.heatLayer([], { radius: 35, blur: 15, maxZoom: 17, opacity: 0.8 }).addTo(this.map);
-                }
-                return;
-            }
+            const species = this.selectedSpecies;  // Default to 'all' if no species selected
+        
             fetch(`${sightings_url}?species=${species}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Sightings fetched for species', species, data);
+                    console.log('Sightings fetched', data);
                     const heatmapData = data.sightings.map(sighting => [
-                        parseFloat(sighting.latitude),
-                        parseFloat(sighting.longitude),
-                        parseFloat(sighting.count)
+                        parseFloat(sighting.checklists.latitude),
+                        parseFloat(sighting.checklists.longitude),
+                        1  // Assuming each sighting has the same weight
                     ]);
-
-                    // Remove the old heatmap layer if it exists
+        
                     if (this.heatmapLayer) {
-                        console.log('Removing existing heatmap layer');
-                        this.map.removeLayer(this.heatmapLayer);
+                        this.map.removeLayer(this.heatmapStyles);
+                        this.heatmapLater = null;
                     }
-
-                    // Create a new heatmap layer with the new data
-                    console.log('Adding new heatmap layer');
-                    this.heatmapLayer = L.heatLayer(heatmapData, { radius: 35, blur: 15, maxZoom: 17, opacity: 0.8 }).addTo(this.map);
+        
+                    this.heatmapLayer = L.heatLayer(heatmapData, {
+                        radius: 35,
+                        blur: 15,
+                        maxZoom: 17,
+                        opacity: 0.8
+                    }).addTo(this.map);
                 })
                 .catch(error => {
-                    console.error('Error fetching sightings data:', error);
+                    console.error('Error fetching sightings:', error);
                 });
         },
+
         navigateToChecklist() {
             if (this.circleMarkerLayer) {
                 const center = this.circleMarkerLayer.getLatLng();
@@ -148,8 +145,8 @@ new Vue({
         }
     },
     watch: {
-        selectedSpecies(newSpecies) {
-            console.log('Selected species changed to', newSpecies);
+        selectedSpecies(newSpecies, oldSpecies) {
+            console.log('Selected species changed to', newSpecies, 'from', oldSpecies);
             this.updateMap();
         }
     }
