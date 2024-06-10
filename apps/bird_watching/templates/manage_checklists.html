@@ -1,0 +1,69 @@
+[[extend 'layout.html']]
+
+<style>
+[v-cloak] {
+    display: none;
+}
+
+#app table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.2em; /* Increase font size for the table */
+}
+
+#app th, #app td {
+    padding: 12px; /* Increase padding for table cells */
+    border: 1px solid #ddd; /* Add border to table cells */
+    text-align: left; /* Align text to the left */
+}
+
+#app tr:hover {
+    background-color: #f5f5f5; /* Add a hover effect for rows */
+}
+
+#app button {
+    font-size: 1em; /* Increase font size for buttons */
+    padding: 8px 16px; /* Increase padding for buttons */
+    margin: 4px 2px; /* Add some margin around buttons */
+}
+</style>
+
+
+<div id="app" v-cloak>
+    <table>
+        <tr v-for="checklist in checklists" :key="checklist.id">
+            <td>{{ checklist.event }}</td>
+            <td>{{ checklist.observation_date }}</td>
+            <td>{{ checklist.latitude }}</td>
+            <td>{{ checklist.longitude }}</td>
+            <td>{{ checklist.observ_time }}</td>
+            <td><input type="text" v-model="checklist.duration" :readonly="!checklist.isEditable" /></td>
+            <td>
+                <table class="nested-table">
+                    <tr v-for="sighting in checklist.sightings" :key="sighting.id">
+                        <td> {{sighting.name }}</td>
+                        <td><input type="number" v-model="sighting.count" :readonly="!checklist.isEditable" /></td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <button @click="toggleEdit(checklist)">Edit</button>
+                <button @click="saveChecklist(checklist)">Save</button>
+                <button @click="deleteChecklist(checklist.id)">Delete</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+
+[[block page_scripts]]
+<script src="https://unpkg.com/vue@next"></script> <!-- Load Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Load Axios -->
+<script>
+    let get_checklists_URL = "[[=XML(get_checklists_URL)]]";
+    let delete_checklist_url = "[[=XML(delete_checklist_url)]]";
+    let update_checklist_url = "[[=XML(update_checklist_url)]]";
+</script>
+<script src="js/manage_checklists.js"></script>
+[[end]]
