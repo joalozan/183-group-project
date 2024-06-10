@@ -64,8 +64,8 @@ def get_checklists():
 def submit_checklist():
     #section for checklists database
     event = datetime.now().strftime("%Y%m%d%H%M%S") #generate event string
-    latitude = 0 #still need to link this from index
-    longitude = 0 #^^^
+    latitude = request.json.get('latitude') 
+    longitude = request.json.get('longitude') 
     observation_date = datetime.now().date()
     observ_time = request.json.get('observ_time')
     #observer_id = don't need as it is set in models
