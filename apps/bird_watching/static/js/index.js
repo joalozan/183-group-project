@@ -74,11 +74,15 @@ new Vue({
             }
         },
         updateMap() {
-            fetch(sightings_url)
+            const species = this.selectedSpecies;
+            fetch(`${sightings_url}?species=${species}`)
                 .then(response => response.json())
                 .then(data => {
-                    const sightings = data.sightings.filter(sighting => this.selectedSpecies === 'all' || sighting.species === this.selectedSpecies);
-                    const heatmapData = sightings.map(sighting => [sighting.latitude, sighting.longitude, sighting.count]);
+                    const heatmapData = data.sightings.map(sighting => [
+                        parseFloat(sighting.latitude),
+                        parseFloat(sighting.longitude),
+                        parseFloat(sighting.count)
+                    ]);
                     this.heatmapLayer.setLatLngs(heatmapData);
                 });
         },
@@ -97,6 +101,11 @@ new Vue({
             } else {
                 alert("Please draw a rectangle to select a region.");
             }
+        }
+    },
+    watch: {
+        selectedSpecies() {
+            this.updateMap();
         }
     }
 });
