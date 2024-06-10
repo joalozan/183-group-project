@@ -64,8 +64,8 @@ def get_checklists():
 def submit_checklist():
     #section for checklists database
     event = datetime.now().strftime("%Y%m%d%H%M%S") #generate event string
-    latitude = request.json.get('latitude') 
-    longitude = request.json.get('longitude') 
+    latitude = 0 #still need to link this from index
+    longitude = 0 #^^^
     observation_date = datetime.now().date()
     observ_time = request.json.get('observ_time')
     #observer_id = don't need as it is set in models
@@ -191,7 +191,15 @@ def species():
 @action.uses(db, auth)
 def sightings():
     try:
-        sightings_list = db(db.sightings).select().as_list()
+        species_name = request.params.get('species')
+        if species_name and species_name != 'all':
+            query = (db.sightings.name == species_name) & (db.sightings.event == db.checklists.event) & \
+                    (db.sightings.count != 'X') & (db.checklists.latitude != '') & (db.checklists.longitude != '')
+        else:
+            query = (db.sightings.event == db.checklists.event) & \
+                    (db.sightings.count != 'X') & (db.checklists.latitude != '') & (db.checklists.longitude != '')
+
+        sightings_list = db(query).select(db.sightings.name, db.sightings.count, db.checklists.latitude, db.checklists.longitude).as_list()
         return dict(sightings=sightings_list)
     except Exception as e:
         logger.error(f"Error in sightings: {e}")
@@ -271,3 +279,4 @@ def event(path=None):
         latitude = latitude,
         longitude = longitude,
     )
+
