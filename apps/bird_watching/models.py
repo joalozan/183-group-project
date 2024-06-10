@@ -23,7 +23,7 @@ def get_time():
 
 def is_valid_date(date_str):
     try:
-        datetime.strptime(date_str, "%Y-%m-%d")  # Adjust this format to match your date format
+        datetime.datetime.strptime(date_str, "%Y-%m-%d")  # Adjust this format to match your date format
         return True
     except ValueError:
         return False

@@ -78,9 +78,19 @@ def user_stats(path=None):
                 query=(db.sightings.event.contains(valid_events)),
                 editable=False,
                 deletable=False,
-                columns=[db.sightings.name, db.sightings.count],
+                details=False,
+                columns=[Column("Species", lambda row: A(f"{row.name}", _href=f"/bird_watching/event/{row.event}")), db.sightings.count],
                 search_queries=[['Search by Name', lambda val: db.sightings.name.contains(val)]],
                 )
     return dict(
         grid=grid,
+    )
+
+@action('event/<path:path>', method=['POST', 'GET'])
+@action('event', method=['POST', 'GET'])
+@action.uses('event.html', db, session, auth)
+def event(path=None):
+    date = db.checklists(db.checklists.event == path).observation_date
+    return dict(
+        date = date,
     )
