@@ -1,0 +1,13 @@
+The video demo uses a random observer_id from checklists.csv, 'obs1644106', just so the demo has content
+you need to "chmod +x py4web.sh" for py4web to start
+
+pip requirements 
+python -m pip install <package>
+
+below are all the packages
+
+py4web
+selenium
+requests
+beautifulsoup4
+bottle
