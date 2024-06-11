@@ -1,5 +1,3 @@
-"use strict";
-
 let app = {};
 
 app.data = {
@@ -27,15 +25,16 @@ app.data = {
 
             const bounds = `${swLat},${swLng},${neLat},${neLng}`;
 
-            axios.get(`/location_details?bounds=${bounds}`)
+            axios.get(`/bird_watching/location_load?swLat=${swLat}&swLng=${swLng}&neLat=${neLat}&neLng=${neLng}`)
                 .then(response => {
+                    console.log("Response data:", response.data);
                     this.locationDetails = response.data.locationDetails;
                     this.topContributors = response.data.topContributors;
                     this.errorMessage = '';
                 })
                 .catch(error => {
+                    console.error("Error fetching location details:", error);
                     this.errorMessage = "Failed to fetch location details.";
-                    console.error(error);
                 });
         },
         selectSpecies: function(speciesName) {
@@ -85,6 +84,7 @@ app.data = {
         }
     },
     mounted: function() {
+        console.log('attmepting mount');
         this.fetchLocationDetails();
     }
 };

@@ -39,7 +39,7 @@
     }
 </style>
 
-<div class="container">
+<div class="container" id="app">
     <h1 class="title">Location Details</h1>
     <div v-if="locationDetails">
         <h2 class="subtitle">{{ locationDetails.name }}</h2>
@@ -67,7 +67,16 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+
+
+<script>
+    let location_load_url = "[[=XML(location_load_url)]]";
+</script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/location.js"></script>
+
+[[end]]

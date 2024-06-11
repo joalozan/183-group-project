@@ -280,9 +280,17 @@ def event(path=None):
         longitude = longitude,
     )
 
+
 @action('location')
-@action.uses('location.html', db, auth)
+@action.uses('location.html', db, auth, url_signer)
 def location():
+    return dict(
+        location_load_url=URL('location_load'),
+    )
+
+@action('location_load', method={'GET', 'POST'})
+@action.uses(db, auth)
+def location_load():
     sw_lat = request.params.get('swLat')
     sw_lng = request.params.get('swLng')
     ne_lat = request.params.get('neLat')
