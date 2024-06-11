@@ -1,3 +1,5 @@
+"use strict";
+
 let app = {};
 
 app.data = {
@@ -17,26 +19,30 @@ app.data = {
             const swLng = urlParams.get('swLng');
             const neLat = urlParams.get('neLat');
             const neLng = urlParams.get('neLng');
-        
-            console.log("URL Parameters:", { swLat, swLng, neLat, neLng });
-        
+
             if (!(swLat && swLng && neLat && neLng)) {
                 this.errorMessage = "No region selected.";
                 return;
             }
-        
-            axios.get(`/bird_watching/location_load?swLat=${swLat}&swLng=${swLng}&neLat=${neLat}&neLng=${neLng}`)
-                .then(response => {
-                    console.log("Response data:", response.data);
-                    this.locationDetails = response.data.locationDetails;
-                    this.topContributors = response.data.topContributors;
-                    this.errorMessage = '';
-                })
-                .catch(error => {
-                    console.error("Error fetching location details:", error);
-                    this.errorMessage = "Failed to fetch location details.";
-                });
-        },        
+
+            axios.get(location_load_url, {
+                params: {
+                    swLat: swLat,
+                    swLng: swLng,
+                    neLat: neLat,
+                    neLng: neLng
+                }
+            })
+            .then(response => {
+                this.locationDetails = response.data.locationDetails;
+                this.topContributors = response.data.topContributors;
+                this.errorMessage = '';
+            })
+            .catch(error => {
+                console.error("Error fetching location details:", error);
+                this.errorMessage = "Failed to fetch location details.";
+            });
+        },
         selectSpecies: function(speciesName) {
             this.selectedSpecies = this.locationDetails.birds.find(bird => bird.name === speciesName);
             this.drawSpeciesChart();
@@ -84,7 +90,6 @@ app.data = {
         }
     },
     mounted: function() {
-        console.log('attmepting mount');
         this.fetchLocationDetails();
     }
 };
