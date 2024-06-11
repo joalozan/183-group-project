@@ -93,20 +93,35 @@ new Vue({
         updateMap() {
             console.log('Updating map for species:', this.selectedSpecies);
             const species = this.selectedSpecies;  // Default to 'all' if no species selected
-        
+            let heatmapData = [];
+
             fetch(`${sightings_url}?species=${species}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log('Sightings fetched', data);
-                    const heatmapData = data.sightings.map(sighting => [
-                        parseFloat(sighting.checklists.latitude),
-                        parseFloat(sighting.checklists.longitude),
-                        1  // Assuming each sighting has the same weight
-                    ]);
+
+                    if (!species || species === 'all' || species === ''){
+                        console.log('species is all');
+                        heatmapData = data.sightings.map(sighting => [
+                            parseFloat(sighting.checklists.latitude),
+                            parseFloat(sighting.checklists.longitude),
+                            parseInt(sighting.sightings.count),  // Assuming each sighting has the same weight
+    
+                        ]);
+                    } else {
+                        heatmapData = data.sightings.filter(sighting => {
+                            return sighting.sightings.name == species;
+                        }).map(sighting => [
+                            parseFloat(sighting.checklists.latitude),
+                            parseFloat(sighting.checklists.longitude),
+                            parseInt(sighting.sightings.count),  // Assuming each sighting has the same weight
+    
+                        ]);
+                    }
         
                     if (this.heatmapLayer) {
-                        this.map.removeLayer(this.heatmapStyles);
-                        this.heatmapLater = null;
+                        this.map.removeLayer(this.heatmapLayer);
+                        this.heatmapLayer = null;
                     }
         
                     this.heatmapLayer = L.heatLayer(heatmapData, {
@@ -115,6 +130,7 @@ new Vue({
                         maxZoom: 17,
                         opacity: 0.8
                     }).addTo(this.map);
+
                 })
                 .catch(error => {
                     console.error('Error fetching sightings:', error);
