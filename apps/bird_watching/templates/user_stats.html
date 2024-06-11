@@ -1,7 +1,64 @@
 [[extend 'layout.html']]
 
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #map {
+        height: 500px;
+        width: 100%;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .button-group {
+        margin-top: 20px;
+    }
+    .button-group button {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+    .button-group button:hover {
+        background-color: white;
+        color: black;
+        border: 2px solid #4CAF50;
+    }
+    .title {
+        color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+    .content {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 1.2em;
+        color: #333;
+    }
+    </style>
+
 <div class="section" >
 
     <!-- Complete -->
     [[=grid.render()]]
+
+    <div class="button-group">
+        <a href="/bird_watching">
+            <button>Go Back</button>
+        </a>
+    </div>
 </div>
