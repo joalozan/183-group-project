@@ -47,8 +47,8 @@ def manage_checklists():
 @action('get_checklists', method=['GET'])
 @action.uses(db, auth.user)
 def get_checklists():
-    #user_email = auth.current_user.get('email') #uncomment this and comment line below and it will be the users checklists
-    user_email = 'obs1644106'
+    user_email = auth.current_user.get('email') #uncomment this and comment line below and it will be the users checklists
+    #user_email = 'obs1644106'
     checklists = db(db.checklists.observer_id == user_email).select().as_list()
 
     for checklist in checklists:
@@ -232,6 +232,8 @@ def stats():
 @action.uses('user_stats.html', db, session, auth)
 def user_stats(path=None):
     valid_events = [checklist.event for checklist in db(db.checklists.observer_id == get_user_email()).select()]
+    if len(valid_events) == 0:
+        redirect(URL('index'))
     grid = Grid(path,
                 formstyle=FormStyleBulma,
                 grid_class_style=GridClassStyleBulma,
