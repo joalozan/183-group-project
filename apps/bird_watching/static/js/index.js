@@ -154,11 +154,24 @@ new Vue({
             if (layers.length > 0) {
                 const layer = layers[0];
                 const bounds = layer.getBounds();
-                window.location.href = `/stats?bounds=${bounds.toBBoxString()}`;
+        
+                // Extract the coordinates
+                const sw = bounds.getSouthWest(); // Southwest corner
+                const ne = bounds.getNorthEast(); // Northeast corner
+        
+                // Convert coordinates to strings
+                const swLat = sw.lat;
+                const swLng = sw.lng;
+                const neLat = ne.lat;
+                const neLng = ne.lng;
+        
+                // Redirect to the location page with bounds as parameters
+                window.location.href = `/bird_watching/location?swLat=${swLat}&swLng=${swLng}&neLat=${neLat}&neLng=${neLng}`
             } else {
                 alert("Please draw a rectangle to select a region.");
             }
         }
+        
     },
     watch: {
         selectedSpecies(newSpecies, oldSpecies) {
