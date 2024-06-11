@@ -231,7 +231,7 @@ def stats():
 @action('user_stats', method=['POST', 'GET'])
 @action.uses('user_stats.html', db, session, auth)
 def user_stats(path=None):
-    valid_events = [checklist.event for checklist in db(db.checklists.observer_id == 'obs1644106').select()]
+    valid_events = [checklist.event for checklist in db(db.checklists.observer_id == get_user_email()).select()]
     grid = Grid(path,
                 formstyle=FormStyleBulma,
                 grid_class_style=GridClassStyleBulma,
@@ -242,29 +242,18 @@ def user_stats(path=None):
                 columns=[Column("Species", lambda row: A(f"{row.name}", _href=f"/bird_watching/event/{row.event}")), db.sightings.count],
                 search_queries=[['Search by Name', lambda val: db.sightings.name.contains(val)]],
                 )
+    histogram = dict()
+    for species in db(db.sightings.event.contains(valid_events)).select():
+        key = db.checklists(db.checklists.event == species.event).observation_date
+        key = str(key)
+        histogram[key] = histogram.get(key, 0) + int(species.count)
+    dates = list(histogram.keys())
+    counts = list(histogram.values())
     return dict(
         grid=grid,
+        dates=dates,
+        counts=counts
     )
-
-#user version
-#@action('user_stats/<path:path>', method=['POST', 'GET'])
-#@action('user_stats', method=['POST', 'GET'])
-#@action.uses('user_stats.html', db, session, auth.user)
-#def user_stats(path=None):
-#    user_email = auth.current_user.get('email')
-#    valid_events = [checklist.event for checklist in db(db.checklists.observer_id == user_email).select()]
-#    grid = Grid(path,
-#                formstyle=FormStyleBulma,
-#                grid_class_style=GridClassStyleBulma,
-#                query=(db.sightings.event.contains(valid_events)),
-#                editable=False,
-#                deletable=False,
-#                columns=[db.sightings.name, db.sightings.count],
-#                search_queries=[['Search by Name', lambda val: db.sightings.name.contains(val)]],
-#                )
-#    return dict(
-#        grid=grid,
-#    )
 
 @action('event/<path:path>', method=['POST', 'GET'])
 @action('event', method=['POST', 'GET'])
