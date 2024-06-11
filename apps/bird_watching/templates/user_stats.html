@@ -56,9 +56,43 @@
     <!-- Complete -->
     [[=grid.render()]]
 
+    <div id='myDiv'></div>
+
     <div class="button-group">
         <a href="/bird_watching">
             <button>Go Back</button>
         </a>
     </div>
+
+   
 </div>
+
+<script src='https://cdn.plot.ly/plotly-2.32.0.min.js'></script>
+
+<script>
+    let dates = "[[=XML(dates)]]";
+    let counts = "[[=XML(counts)]]";
+    dates = dates.slice(1,-1).split(", ");
+    counts = counts.slice(1,-1).split(", ").map(Number);
+
+    console.log(dates);
+    console.log(counts);
+
+    var trace = {
+        histfunc: "sum",
+        x: dates,
+        y: counts,
+        type: 'histogram',
+    };
+    var layout = {
+        title: 'Bird Sightings',
+        xaxis: {
+            title: 'Date'
+        },
+        yaxis: {
+            title: 'Number of Sightings'
+        }
+    };
+    var data = [trace];
+    Plotly.newPlot('myDiv', data, layout);
+</script>

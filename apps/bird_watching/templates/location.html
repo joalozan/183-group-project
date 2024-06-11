@@ -1,0 +1,123 @@
+[[extend 'layout.html']]
+
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    .container {
+        margin: 20px;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+    .main-content {
+        flex: 2;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    .sidebar {
+        flex: 1;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        align-self: flex-start;
+    }
+    .title {
+        color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .subtitle {
+        color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .list-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+    .list-item:hover {
+        background-color: #f0f0f0;
+        transform: scale(1.02);
+    }
+    .chart-container {
+        margin-top: 20px;
+    }
+    .error-message {
+        color: red;
+        font-weight: bold;
+        text-align: center;
+    }
+    .leaderboard {
+        border: 2px solid #3b5998;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+    .leaderboard .list-item {
+        border: none;
+        border-bottom: 1px solid #ddd;
+        padding: 8px 0;
+    }
+    .leaderboard .list-item:last-child {
+        border-bottom: none;
+    }
+    .highlight {
+        background-color: #e6f7ff;
+    }
+</style>
+
+<div class="container" id="app">
+    <div class="main-content highlight">
+        <h1 class="title">Location Details</h1>
+        <div v-if="locationDetails">
+            <h2 class="subtitle">{{ locationDetails.name }}</h2>
+            <p>{{ locationDetails.description }}</p>
+            <h3 class="subtitle">Birds</h3>
+            <ul class="list">
+                <li class="list-item" v-for="bird in locationDetails.birds" :key="bird.name" @click="selectSpecies(bird.name)">
+                    {{ bird.name }}: {{ bird.checklistCount }} checklists, {{ bird.sightingsCount }} sightings
+                </li>
+            </ul>
+            <div class="chart-container" v-if="selectedSpecies">
+                <h3 class="subtitle">{{ selectedSpecies.name }} Sightings Over Time</h3>
+                <canvas id="speciesChart"></canvas>
+            </div>
+        </div>
+        <div v-else-if="errorMessage" class="error-message">
+            <p>{{ errorMessage }}</p>
+        </div>
+    </div>
+    <div class="sidebar leaderboard">
+        <h3 class="subtitle">Top Contributors</h3>
+        <ul class="list">
+            <li class="list-item" v-for="contributor in topContributors" :key="contributor.name">
+                {{ contributor.name }} - {{ contributor.checklists }} checklists
+            </li>
+        </ul>
+    </div>
+</div>
+
+[[block page_scripts]]
+<script>
+    let location_load_url = "[[=XML(location_load_url)]]";
+</script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/location.js"></script>
+[[end]]

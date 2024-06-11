@@ -231,7 +231,7 @@ def stats():
 @action('user_stats', method=['POST', 'GET'])
 @action.uses('user_stats.html', db, session, auth)
 def user_stats(path=None):
-    valid_events = [checklist.event for checklist in db(db.checklists.observer_id == 'obs1644106').select()]
+    valid_events = [checklist.event for checklist in db(db.checklists.observer_id == get_user_email()).select()]
     grid = Grid(path,
                 formstyle=FormStyleBulma,
                 grid_class_style=GridClassStyleBulma,
@@ -242,29 +242,18 @@ def user_stats(path=None):
                 columns=[Column("Species", lambda row: A(f"{row.name}", _href=f"/bird_watching/event/{row.event}")), db.sightings.count],
                 search_queries=[['Search by Name', lambda val: db.sightings.name.contains(val)]],
                 )
+    histogram = dict()
+    for species in db(db.sightings.event.contains(valid_events)).select():
+        key = db.checklists(db.checklists.event == species.event).observation_date
+        key = str(key)
+        histogram[key] = histogram.get(key, 0) + int(species.count)
+    dates = list(histogram.keys())
+    counts = list(histogram.values())
     return dict(
         grid=grid,
+        dates=dates,
+        counts=counts
     )
-
-#user version
-#@action('user_stats/<path:path>', method=['POST', 'GET'])
-#@action('user_stats', method=['POST', 'GET'])
-#@action.uses('user_stats.html', db, session, auth.user)
-#def user_stats(path=None):
-#    user_email = auth.current_user.get('email')
-#    valid_events = [checklist.event for checklist in db(db.checklists.observer_id == user_email).select()]
-#    grid = Grid(path,
-#                formstyle=FormStyleBulma,
-#                grid_class_style=GridClassStyleBulma,
-#                query=(db.sightings.event.contains(valid_events)),
-#                editable=False,
-#                deletable=False,
-#                columns=[db.sightings.name, db.sightings.count],
-#                search_queries=[['Search by Name', lambda val: db.sightings.name.contains(val)]],
-#                )
-#    return dict(
-#        grid=grid,
-#    )
 
 @action('event/<path:path>', method=['POST', 'GET'])
 @action('event', method=['POST', 'GET'])
@@ -280,3 +269,122 @@ def event(path=None):
         longitude = longitude,
     )
 
+
+@action('location')
+@action.uses('location.html', db, auth, url_signer)
+def location():
+    return dict(
+        location_load_url=URL('location_load'),
+    )
+
+@action('location_load', method={'GET', 'POST'})
+@action.uses(db, auth)
+def location_load():
+    sw_lat = request.params.get('swLat')
+    sw_lng = request.params.get('swLng')
+    ne_lat = request.params.get('neLat')
+    ne_lng = request.params.get('neLng')
+
+    logger.info(f"Received bounds: swLat={sw_lat}, swLng={sw_lng}, neLat={ne_lat}, neLng={ne_lng}")
+
+
+    if not (sw_lat and sw_lng and ne_lat and ne_lng):
+        abort(400, "Missing bounds parameter")
+
+    # Parse bounds
+    try:
+        sw_lat = float(sw_lat)
+        sw_lng = float(sw_lng)
+        ne_lat = float(ne_lat)
+        ne_lng = float(ne_lng)
+    except ValueError:
+        abort(400, "Invalid bounds parameter format")
+
+    logger.info(f"Parsed bounds: swLat={sw_lat}, swLng={sw_lng}, neLat={ne_lat}, neLng={ne_lng}")
+
+    # Fetch checklists within bounds
+    checklists_in_bounds = db((db.checklists.latitude.cast('float') >= sw_lat) & 
+                              (db.checklists.latitude.cast('float') <= ne_lat) &
+                              (db.checklists.longitude.cast('float') >= sw_lng) &
+                              (db.checklists.longitude.cast('float') <= ne_lng)).select().as_list()
+
+    logger.info("Checklists in bounds:", checklists_in_bounds)
+
+    if not checklists_in_bounds:
+        logger.warning("No checklists found within the specified bounds.")
+        return dict(locationDetails={}, topContributors=[])
+
+
+    # Collect all sampling event identifiers within the bounds
+    event_ids = [checklist['event'] for checklist in checklists_in_bounds]
+
+    # Fetch sightings for these event ids
+    sightings_in_bounds = db(db.sightings.event.belongs(event_ids)).select()
+
+    # Process sightings to calculate species counts and sightings over time
+    species_counts = {}
+    species_sightings_over_time = {}
+    for sighting in sightings_in_bounds:
+        species = sighting['name']
+        count_str = sighting['count']
+        try:
+            count = int(count_str)
+        except ValueError:
+            logger.warning(f"Non-integer count value encountered: {count_str}")
+            continue  # Skip this sighting if count is not an integer
+        
+        event = sighting['event']
+        date = db(db.checklists.event == event).select().first()['observation_date']
+        logger.info(f"Sighting: {sighting}, Date: {date}")
+
+        if species in species_counts:
+            species_counts[species]['checklistCount'] += 1
+            species_counts[species]['sightingsCount'] += count
+        else:
+            species_counts[species] = {'checklistCount': 1, 'sightingsCount': count}
+
+        if species not in species_sightings_over_time:
+            species_sightings_over_time[species] = {}
+
+        if date in species_sightings_over_time[species]:
+            species_sightings_over_time[species][date] += count
+        else:
+            species_sightings_over_time[species][date] = count
+
+
+    birds = [
+        {
+            'name': species,
+            'checklistCount': data['checklistCount'],
+            'sightingsCount': data['sightingsCount'],
+            'sightingsOverTime': [{'date': date, 'count': count} for date, count in species_sightings_over_time[species].items()]
+        }
+        for species, data in species_counts.items()
+    ]
+
+
+    # Calculate top contributors
+    contributor_counts = {}
+    for checklist in checklists_in_bounds:
+        observer = checklist['observer_id']
+        if observer in contributor_counts:
+            contributor_counts[observer] += 1
+        else:
+            contributor_counts[observer] = 1
+
+    top_contributors = sorted(contributor_counts.items(), key=lambda item: item[1], reverse=True)
+
+    print("Top contributors:", top_contributors)
+
+    location_details = {
+        "name": f"Region ({sw_lat}, {sw_lng}) to ({ne_lat}, {ne_lng})",
+        "description": f"Details for region from ({sw_lat}, {sw_lng}) to ({ne_lat}, {ne_lng})",
+        "birds": birds
+    }
+
+    top_contributors_list = [{"name": contributor, "checklists": count} for contributor, count in top_contributors]
+
+    return dict(
+        locationDetails=location_details,
+        topContributors=top_contributors_list
+    )
